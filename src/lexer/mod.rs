@@ -1,6 +1,6 @@
 use crate::tokens;
 
-struct Lexer {
+pub struct Lexer {
     input: String,
     position: usize,
     read_position: usize,
@@ -111,7 +111,7 @@ impl Lexer {
     }
 }
 
-fn new(input: String) -> Lexer {
+pub fn new(input: String) -> Lexer {
     let mut l = Lexer {
         input: input,
         position: 0,
