@@ -1,11 +1,10 @@
-// #[derive(PartialEq)]
 #[derive(Debug, PartialEq)]
 pub enum Type {
     Illegal,
     EOF,
 
     // identifiers and literals
-    Identifer,
+    Identifier,
     Integer,
 
     // operators
@@ -29,4 +28,12 @@ pub enum Type {
 pub struct Token {
     pub kind: Type,
     pub literal: String,
+}
+
+pub fn lookup_identifier(lit: String) -> Type {
+    return match lit.as_ref() {
+        "fn" => Type::Function,
+        "let" => Type::Let,
+        _ => Type::Identifier,
+    };
 }

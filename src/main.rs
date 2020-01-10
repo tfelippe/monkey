@@ -3,7 +3,7 @@ mod tokens;
 
 fn main() {
     let tok = tokens::Token {
-        kind: tokens::Type::Identifer,
+        kind: tokens::Type::Identifier,
         literal: String::from("hello"),
     };
 
