@@ -10,6 +10,16 @@ pub enum Type {
     // operators
     Assign,
     Plus,
+    Minus,
+    Bang,
+    Asterisk,
+    Slash,
+
+    LessThan,
+    GreaterThan,
+
+    Equal,
+    NotEqual,
 
     // delimiters
     Comma,
@@ -23,6 +33,11 @@ pub enum Type {
     // keywords
     Function,
     Let,
+    True,
+    False,
+    If,
+    Else,
+    Return,
 }
 
 pub struct Token {
@@ -34,6 +49,11 @@ pub fn lookup_identifier(lit: String) -> Type {
     return match lit.as_ref() {
         "fn" => Type::Function,
         "let" => Type::Let,
+        "true" => Type::True,
+        "false" => Type::False,
+        "if" => Type::If,
+        "else" => Type::Else,
+        "return" => Type::Return,
         _ => Type::Identifier,
     };
 }

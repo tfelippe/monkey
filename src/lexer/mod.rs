@@ -12,12 +12,36 @@ impl Lexer {
         self.skip_whitespace();
 
         let token = match self.ch {
-            '=' => make_token(tokens::Type::Assign, self.ch.to_string()),
+            '=' => {
+                if self.peek_char() == '=' {
+                    let ch = self.ch;
+                    self.read_char();
+                    let lit = ch.to_string() + &self.ch.to_string();
+                    make_token(tokens::Type::Equal, lit)
+                } else {
+                    make_token(tokens::Type::Assign, self.ch.to_string())
+                }
+            }
+            '!' => {
+                if self.peek_char() == '=' {
+                    let ch = self.ch;
+                    self.read_char();
+                    let lit = ch.to_string() + &self.ch.to_string();
+                    make_token(tokens::Type::NotEqual, lit)
+                } else {
+                    make_token(tokens::Type::Bang, self.ch.to_string())
+                }
+            }
             ';' => make_token(tokens::Type::Semicolon, self.ch.to_string()),
             '(' => make_token(tokens::Type::LeftParen, self.ch.to_string()),
             ')' => make_token(tokens::Type::RightParen, self.ch.to_string()),
             ',' => make_token(tokens::Type::Comma, self.ch.to_string()),
             '+' => make_token(tokens::Type::Plus, self.ch.to_string()),
+            '-' => make_token(tokens::Type::Minus, self.ch.to_string()),
+            '/' => make_token(tokens::Type::Slash, self.ch.to_string()),
+            '*' => make_token(tokens::Type::Asterisk, self.ch.to_string()),
+            '<' => make_token(tokens::Type::LessThan, self.ch.to_string()),
+            '>' => make_token(tokens::Type::GreaterThan, self.ch.to_string()),
             '{' => make_token(tokens::Type::LeftBrace, self.ch.to_string()),
             '}' => make_token(tokens::Type::RightBrace, self.ch.to_string()),
             '\0' => make_token(tokens::Type::EOF, "\0".to_string()),
@@ -38,6 +62,15 @@ impl Lexer {
 
         self.read_char();
         return token;
+    }
+
+    fn peek_char(&self) -> char {
+        if self.read_position >= self.input.len() {
+            return '\0';
+        } else {
+            let ch = self.input.chars().nth(self.read_position).unwrap();
+            return ch;
+        }
     }
 
     fn read_number(&mut self) -> String {
@@ -119,6 +152,17 @@ mod lexer {
             };
 
             let result = add(five, ten);
+            !-/*5;
+            5 < 10 > 5;
+
+            if (5 < 10) {
+                return true;
+            } else {
+                return false;
+            }
+
+            10 == 10;
+            10 != 9;
         "#;
 
         let mut l = new(input.to_string());
@@ -159,13 +203,50 @@ mod lexer {
             (tokens::Type::Identifier, "ten"),
             (tokens::Type::RightParen, ")"),
             (tokens::Type::Semicolon, ";"),
+            (tokens::Type::Bang, "!"),
+            (tokens::Type::Minus, "-"),
+            (tokens::Type::Slash, "/"),
+            (tokens::Type::Asterisk, "*"),
+            (tokens::Type::Integer, "5"),
+            (tokens::Type::Semicolon, ";"),
+            (tokens::Type::Integer, "5"),
+            (tokens::Type::LessThan, "<"),
+            (tokens::Type::Integer, "10"),
+            (tokens::Type::GreaterThan, ">"),
+            (tokens::Type::Integer, "5"),
+            (tokens::Type::Semicolon, ";"),
+            (tokens::Type::If, "if"),
+            (tokens::Type::LeftParen, "("),
+            (tokens::Type::Integer, "5"),
+            (tokens::Type::LessThan, "<"),
+            (tokens::Type::Integer, "10"),
+            (tokens::Type::RightParen, ")"),
+            (tokens::Type::LeftBrace, "{"),
+            (tokens::Type::Return, "return"),
+            (tokens::Type::True, "true"),
+            (tokens::Type::Semicolon, ";"),
+            (tokens::Type::RightBrace, "}"),
+            (tokens::Type::Else, "else"),
+            (tokens::Type::LeftBrace, "{"),
+            (tokens::Type::Return, "return"),
+            (tokens::Type::False, "false"),
+            (tokens::Type::Semicolon, ";"),
+            (tokens::Type::RightBrace, "}"),
+            (tokens::Type::Integer, "10"),
+            (tokens::Type::Equal, "=="),
+            (tokens::Type::Integer, "10"),
+            (tokens::Type::Semicolon, ";"),
+            (tokens::Type::Integer, "10"),
+            (tokens::Type::NotEqual, "!="),
+            (tokens::Type::Integer, "9"),
+            (tokens::Type::Semicolon, ";"),
             (tokens::Type::EOF, "\0"),
         ];
 
         for (expected_type, expected_literal) in &tests {
             let tok = l.next_token();
 
-            assert_eq!(tok.kind, *expected_type);
+            assert_eq!(tok.kind, *expected_type, "{}", expected_literal);
             assert_eq!(tok.literal, *expected_literal);
         }
     }
